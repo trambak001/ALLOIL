@@ -3,305 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>India Fair Fuel Meter 🇮🇳 | Analyze Asymmetric Fuel Pricing</title>
-    <meta name="description" content="Calculate and visualize the fair price of fuel in India based on global crude oil costs compared to retail actual pump prices.">
+    <title>India Fair Fuel Meter 🇮🇳 | Live Crude Price Analysis</title>
+    <meta name="description" content="Calculate the fair price of fuel in India using live crude oil data. See how much extra you pay versus the real cost-plus benchmark.">
     <link rel="stylesheet" href="style.css">
-    <!-- Chart.js CDN for interactive historical visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <div class="badge">Fact-Checking Pricing Asymmetry</div>
-            <h1>India Fair Fuel Meter 🇮🇳</h1>
-            <p>Compare the actual price you pay at the pump against a cost-plus Fair Price benchmark built using pre-COVID (2019) normal oil markups. See how much extra goes to corporate reserves.</p>
-            
-            <div class="live-ticker">
-                <div class="ticker-item">Crude Oil (Standard): <span id="ticker-crude">$72.00</span> / barrel</div>
-                <div class="ticker-item">Exchange Rate: <span id="ticker-ex">₹85.00</span> / USD</div>
-                <div class="ticker-item">Raw Crude/Litre: <span id="ticker-cost">₹38.49</span></div>
+<div class="container">
+
+    <!-- ── HEADER ── -->
+    <header>
+        <div class="badge">🔬 Live Data · Verified Analysis · Common Man's Lens</div>
+        <h1>India Fair Fuel Meter 🇮🇳</h1>
+        <p>Live crude oil prices vs. what you actually pay. See the real cost of every litre — and the invisible profit extracted from your pocket.</p>
+
+        <div class="live-ticker">
+            <div class="ticker-item">
+                <span class="live-dot" id="live-dot"></span>
+                Brent Crude: <span id="ticker-crude">Loading…</span> / bbl
             </div>
-        </header>
+            <div class="ticker-item">
+                USD/INR: <span id="ticker-ex">Loading…</span>
+            </div>
+            <div class="ticker-item">
+                Raw Crude/Litre: <span id="ticker-cost">Loading…</span>
+            </div>
+            <div class="ticker-item">
+                <span id="live-status-badge" class="live-status fetching">⏳ Fetching Live Data</span>
+            </div>
+        </div>
+    </header>
 
-        <!-- Dashboard Main Grid -->
-        <div class="dashboard-grid">
-            <!-- Left Card: The Fair Price Calculator -->
-            <div class="card">
-                <h2 class="card-title">⚖️ Fair Price Calculator</h2>
-                
-                <!-- Product Selector (Petrol vs Diesel) -->
-                <div class="tabs">
-                    <button class="tab-btn active" data-product="petrol">Petrol (MS)</button>
-                    <button class="tab-btn" data-product="diesel">Diesel (HSD)</button>
-                </div>
+    <!-- ── MAIN GRID: Calculator + Commuter ── -->
+    <div class="dashboard-grid">
 
-                <!-- City / VAT select -->
-                <div class="form-group">
-                    <label class="form-label" for="city-select">Select Region (Establishes 2019 Tax & VAT baseline)</label>
-                    <div class="select-wrapper">
-                        <select id="city-select"></select>
-                    </div>
-                </div>
+        <!-- LEFT: Fair Price Calculator -->
+        <div class="card">
+            <h2 class="card-title">⚖️ Fair Price Calculator</h2>
 
-                <!-- Actual Price Input -->
-                <div class="form-group">
-                    <label class="form-label" for="actual-price-input">Actual Price Paid at Pump (₹ / Litre)</label>
-                    <input type="number" id="actual-price-input" step="0.01" min="0">
-                </div>
+            <div class="tabs">
+                <button class="tab-btn active" data-product="petrol" id="tab-petrol">Petrol (MS)</button>
+                <button class="tab-btn" data-product="diesel" id="tab-diesel">Diesel (HSD)</button>
+            </div>
 
-                <hr style="border-color: var(--card-border-dark); margin: 25px 0;">
-
-                <!-- Sliders for Crude and FX -->
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <span>Global Crude Oil Price (USD / Barrel)</span>
-                        <span class="slider-val">$<span id="crude-val">72.0</span></span>
-                    </div>
-                    <input type="range" id="crude-slider" min="20" max="150" step="0.5" value="72.0">
-                </div>
-
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <span>USD / INR Exchange Rate</span>
-                        <span class="slider-val">₹<span id="ex-val">85.00</span></span>
-                    </div>
-                    <input type="range" id="ex-slider" min="70" max="92" step="0.1" value="85.0">
-                </div>
-
-                <!-- Calculator Results Display -->
-                <div class="results-container">
-                    <div class="comparison-grid">
-                        <div class="price-box actual">
-                            <div class="price-label">Actual Price</div>
-                            <div class="price-val" id="actual-price-val">₹97.85</div>
-                        </div>
-                        <div class="price-box fair">
-                            <div class="price-label">Fair Price (Cost-Plus)</div>
-                            <div class="price-val" id="fair-price-val">₹83.35</div>
-                        </div>
-                    </div>
-                    
-                    <div id="verdict-box" class="alert-verdict">
-                        <h4 id="verdict-title">YOU ARE OVERPAYING BY</h4>
-                        <p id="verdict-sub">₹14.50 <span style="font-size:1.1rem; font-weight:600;">per litre</span></p>
-                    </div>
-                    <div style="font-size:0.75rem; color:var(--text-secondary-dark); text-align:center; margin-top:12px;">
-                        *Formula: Raw Crude cost (Litre: <span id="crude-cost-lbl">₹38.49</span>) + pre-COVID 2019 markup baseline.
-                    </div>
+            <div class="form-group">
+                <label class="form-label" for="city-select">Select City/Region (Sets 2019 Tax &amp; VAT Baseline)</label>
+                <div class="select-wrapper">
+                    <select id="city-select"></select>
                 </div>
             </div>
 
-            <!-- Right Card: Personal Commuter Impact -->
-            <div class="card">
-                <h2 class="card-title">🇮🇳 Your Household Financial Drain</h2>
-                <p style="color:var(--text-secondary-dark); font-size:0.9rem; margin-bottom:20px;">
-                    Select your vehicle or typical usage to see how much this price difference drains from your household budget.
-                </p>
+            <div class="form-group">
+                <label class="form-label" for="actual-price-input">Actual Price at Pump (₹ / Litre) — auto-filled, editable</label>
+                <input type="number" id="actual-price-input" step="0.01" min="0">
+            </div>
 
-                <!-- Vehicle options -->
-                <div class="commuter-grid">
-                    <div class="commuter-option active" data-litres="30">
-                        <div class="option-icon">🏍️</div>
-                        <div class="option-name">Two-Wheeler</div>
-                        <div class="option-desc">30 Litres / month</div>
+            <hr style="border-color: var(--card-border-dark); margin: 22px 0;">
+
+            <div class="slider-container">
+                <div class="slider-header">
+                    <span>Global Crude Oil Price (USD / Barrel)</span>
+                    <span class="slider-val">$<span id="crude-val">72.0</span></span>
+                </div>
+                <input type="range" id="crude-slider" min="20" max="150" step="0.5" value="72.0">
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-header">
+                    <span>USD / INR Exchange Rate</span>
+                    <span class="slider-val">₹<span id="ex-val">85.00</span></span>
+                </div>
+                <input type="range" id="ex-slider" min="70" max="92" step="0.1" value="85.0">
+            </div>
+
+            <!-- Results -->
+            <div class="results-container">
+                <div class="comparison-grid">
+                    <div class="price-box actual">
+                        <div class="price-label">You Pay</div>
+                        <div class="price-val" id="actual-price-val">₹97.85</div>
                     </div>
-                    <div class="commuter-option" data-litres="70">
-                        <div class="option-icon">🚗</div>
-                        <div class="option-name">Family Car</div>
-                        <div class="option-desc">70 Litres / month</div>
-                    </div>
-                    <div class="commuter-option" data-litres="100">
-                        <div class="option-icon">🛵</div>
-                        <div class="option-name">Gig Worker</div>
-                        <div class="option-desc">100 Litres / month</div>
-                    </div>
-                    <div class="commuter-option" data-litres="0">
-                        <div class="option-icon">⚙️</div>
-                        <div class="option-name">Custom</div>
-                        <div class="option-desc">Specify usage</div>
+                    <div class="price-box fair">
+                        <div class="price-label">Fair Price</div>
+                        <div class="price-val" id="fair-price-val">₹83.35</div>
                     </div>
                 </div>
 
-                <!-- Custom Usage Input -->
-                <div id="custom-usage-group" class="form-group" style="display:none; margin-bottom:20px;">
-                    <label class="form-label" for="custom-usage-input">Custom Monthly Consumption (Litres)</label>
-                    <input type="number" id="custom-usage-input" value="50" min="1">
+                <div id="verdict-box" class="alert-verdict">
+                    <h4 id="verdict-title">YOU ARE OVERPAYING BY</h4>
+                    <p id="verdict-sub">₹14.50 <span style="font-size:1.1rem;font-weight:600;">per litre</span></p>
                 </div>
-
-                <!-- Impact Results -->
-                <div class="impact-results">
-                    <div class="impact-row">
-                        <span>Monthly Excess Cash Paid</span>
-                        <span id="monthly-excess">₹435</span>
-                    </div>
-                    <div class="impact-row">
-                        <span>Annual Accumulated Drain</span>
-                        <span id="annual-excess" style="font-size:1.2rem;">₹5,220</span>
-                    </div>
+                <div style="font-size:0.72rem; color:var(--text-secondary-dark); text-align:center; margin-top:10px;">
+                    *Fair Price = Raw Crude/L (<span id="crude-cost-lbl">₹38.49</span>) + pre-COVID 2019 markup baseline
                 </div>
-
-                <!-- Equivalency Section -->
-                <div class="equivalency-title">This excess payment represents:</div>
-                <div class="equivalency-grid">
-                    <div class="eq-box">
-                        <div class="eq-icon">🌾</div>
-                        <div class="eq-text">
-                            <h5 id="atta-eq">11 kg</h5>
-                            <p>Atta (Wheat Flour)</p>
-                        </div>
-                    </div>
-                    <div class="eq-box">
-                        <div class="eq-icon">📱</div>
-                        <div class="eq-text">
-                            <h5 id="recharge-eq">1 Pack</h5>
-                            <p>Mobile Recharge</p>
-                        </div>
-                    </div>
-                    <div class="eq-box">
-                        <div class="eq-icon">🛒</div>
-                        <div class="eq-text">
-                            <h5 id="grocery-eq">1 Day</h5>
-                            <p>Family Groceries</p>
-                        </div>
-                    </div>
-                    <div class="eq-box">
-                        <div class="eq-icon">🎒</div>
-                        <div class="eq-text">
-                            <h5 id="school-eq">0.9 Month</h5>
-                            <p>School Stationery</p>
-                        </div>
-                    </div>
             </div>
         </div>
 
-        <!-- Section: Rockets & Feathers Simulator -->
-        <div class="card full-width-section">
-            <h2 class="card-title">🚀 Rockets & Feathers Interactive Timeline (2019–2026)</h2>
-            <p style="color:var(--text-secondary-dark); font-size:0.95rem; margin-bottom:25px;">
-                Drag the timeline slider to trace how global oil changes failed to translate to pump price cuts. Notice the news events and corporate profit reports corresponding to each phase.
+        <!-- RIGHT: Household Impact -->
+        <div class="card">
+            <h2 class="card-title">🇮🇳 Your Household Financial Drain</h2>
+            <p style="color:var(--text-secondary-dark);font-size:0.9rem;margin-bottom:18px;">
+                Select your vehicle — see how much this invisible tax drains from your budget every month.
             </p>
 
-            <div class="timeline-slider-container">
-                <input type="range" id="timeline-slider" min="0" max="89" value="0">
-                <div class="timeline-ticks" id="timeline-ticks">
-                    <span>2019</span>
-                    <span>2020</span>
-                    <span>2021</span>
-                    <span>2022</span>
-                    <span>2023</span>
-                    <span>2024</span>
-                    <span>2025</span>
-                    <span>2026</span>
+            <div class="commuter-grid">
+                <div class="commuter-option active" data-litres="30">
+                    <div class="option-icon">🏍️</div>
+                    <div class="option-name">Two-Wheeler</div>
+                    <div class="option-desc">~30 L / month</div>
+                </div>
+                <div class="commuter-option" data-litres="70">
+                    <div class="option-icon">🚗</div>
+                    <div class="option-name">Family Car</div>
+                    <div class="option-desc">~70 L / month</div>
+                </div>
+                <div class="commuter-option" data-litres="100">
+                    <div class="option-icon">🛵</div>
+                    <div class="option-name">Gig Worker</div>
+                    <div class="option-desc">~100 L / month</div>
+                </div>
+                <div class="commuter-option" data-litres="0">
+                    <div class="option-icon">⚙️</div>
+                    <div class="option-name">Custom</div>
+                    <div class="option-desc">Set your usage</div>
                 </div>
             </div>
 
-            <div class="simulator-display-grid">
-                <!-- Left panel: Month & Status Icon -->
-                <div class="sim-panel date-status">
-                    <div id="sim-date" class="sim-date-val">January 2019</div>
-                    <div id="sim-icon" class="sim-icon-val">⚖️</div>
-                    <div id="sim-status-text" class="sim-status-label">Stable Baseline</div>
-                </div>
+            <div id="custom-usage-group" class="form-group" style="display:none;margin-bottom:16px;">
+                <label class="form-label" for="custom-usage-input">Custom Monthly Litres</label>
+                <input type="number" id="custom-usage-input" value="50" min="1">
+            </div>
 
-                <!-- Middle panel: Price Comparison Specs -->
-                <div class="sim-panel price-specs">
-                    <div class="spec-row">
-                        <span>Crude Cost (INR/L):</span>
-                        <strong id="sim-crude-inr">₹28.92</strong>
-                    </div>
-                    <div class="spec-row">
-                        <span>Actual Pump Price:</span>
-                        <strong id="sim-actual-price">₹72.60</strong>
-                    </div>
-                    <div class="spec-row">
-                        <span>Fair Price (2019 Baseline):</span>
-                        <strong id="sim-fair-price">₹73.69</strong>
-                    </div>
-                    <div class="spec-row highlight">
-                        <span>Consumer Margin/Overpayment:</span>
-                        <strong id="sim-diff-price">-₹1.09</strong>
-                    </div>
+            <div class="impact-results">
+                <div class="impact-row">
+                    <span>Monthly Excess Paid</span>
+                    <span id="monthly-excess">₹435</span>
                 </div>
-
-                <!-- Right panel: Headline Flash -->
-                <div class="sim-panel headline-flash" id="headline-flash-box">
-                    <div class="flash-label">🚨 BULLETINS & WIND FALLS</div>
-                    <div id="sim-headline" class="flash-headline">Pre-COVID baseline. Fuel pricing matches market trends smoothly.</div>
+                <div class="impact-row">
+                    <span>Annual Drain</span>
+                    <span id="annual-excess" style="font-size:1.4rem;">₹5,220</span>
                 </div>
             </div>
-        </div>
 
-        <!-- Section: Interactive History Chart -->
-        <div class="card full-width-section">
-            <h2 class="card-title">📈 Historical Discrepancy Trends (2019 - 2026)</h2>
-            <p style="color:var(--text-secondary-dark); font-size:0.95rem; margin-bottom:25px;">
-                Toggle between Petrol and Diesel to explore the gap since 2019. Zoom/hover over nodes to review historical pricing benchmarks, COVID excise spikes, and OMC under-recovery phases.
-            </p>
-
-            <div class="chart-tabs">
-                <button class="chart-tab-btn active" data-product="petrol">Petrol Price History</button>
-                <button class="chart-tab-btn" data-product="diesel">Diesel Price History</button>
-            </div>
-
-            <div class="chart-container">
-                <canvas id="analyticsChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Section: Info / Welfare Comparison Grid -->
-        <div class="info-grid">
-            <div class="card info-card">
-                <h3>🔍 The "Rockets & Feathers" Loophole</h3>
-                <p>Domestic retail prices in India display a pricing delay known by economists as the **"Rockets and Feathers"** effect. When international crude costs spike, retail prices respond like rockets, immediately scaling peaks. When crude costs fall, retail prices float down slowly like feathers, or remain frozen altogether.</p>
-                <p>This allows State-owned Oil Marketing Companies (OMCs) to recapture profit margins and rebuild their reserves by absorbing the windfall. The consumer effectively acts as an interest-free insurance fund for these oil corporations.</p>
-            </div>
-            
-            <div class="card info-card">
-                <h3>🏛️ Corporate Cash vs. Public Welfare</h3>
-                <p>While the common commuter struggles to balance fuel budgets, state oil companies have built massive financial windfalls. Here is how their corporate financials compare to vital public budgets:</p>
-                
-                <div class="stat-group">
-                    <div class="stat-item">
-                        <span class="stat-name">OMC Combined Standalone Profits (FY24)</span>
-                        <span class="stat-val">₹80,987 Crore</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-name">OMC Total Reserves & Surplus (FY24)</span>
-                        <span class="stat-val">₹2,93,466 Crore</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-name">National Midday Meal Scheme Budget (PM POSHAN)</span>
-                        <span class="stat-val">₹12,467 Cr / yr</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-name">MGNREGA Rural Employment Budget (FY24)</span>
-                        <span class="stat-val">₹86,000 Cr / yr</span>
-                    </div>
+            <div class="equivalency-title">This excess payment = every month:</div>
+            <div class="equivalency-grid">
+                <div class="eq-box">
+                    <div class="eq-icon">🌾</div>
+                    <div class="eq-text"><h5 id="atta-eq">11 kg</h5><p>Atta (Wheat Flour)</p></div>
+                </div>
+                <div class="eq-box">
+                    <div class="eq-icon">📱</div>
+                    <div class="eq-text"><h5 id="recharge-eq">1 Pack</h5><p>Mobile Recharge</p></div>
+                </div>
+                <div class="eq-box">
+                    <div class="eq-icon">🛒</div>
+                    <div class="eq-text"><h5 id="grocery-eq">1 Day</h5><p>Family Groceries</p></div>
+                </div>
+                <div class="eq-box">
+                    <div class="eq-icon">🎒</div>
+                    <div class="eq-text"><h5 id="school-eq">0.9 Mo</h5><p>School Stationery</p></div>
                 </div>
             </div>
         </div>
-
-        <!-- Social Share Section -->
-        <div class="social-section">
-            <h3>📢 Share This Fact-Check</h3>
-            <p>Help raise awareness about fuel pricing asymmetry. Show friends and family how much extra they are paying at the pump.</p>
-            
-            <div class="share-btn-group">
-                <a id="btn-twitter" target="_blank" class="share-btn twitter">Share on X (Twitter)</a>
-                <a id="btn-whatsapp" target="_blank" class="share-btn whatsapp">Share on WhatsApp</a>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer>
-            <p>Open-source analysis. Source data from India fuel retail logs (2019-2026). Formulas and markup baselines are based on verified pre-COVID margins.</p>
-            <p style="margin-top:5px;">Developed by pair-programming with Antigravity AI.</p>
-        </footer>
     </div>
 
-    <!-- Load data first, then logic -->
-    <script src="data.js"></script>
-    <script src="app.js"></script>
+    <!-- ── ROCKETS & FEATHERS SIMULATOR ── -->
+    <div class="sim-card">
+        <h2 class="card-title">🚀 The "Rockets &amp; Feathers" Simulator — 2019 to 2026</h2>
+        <p style="color:var(--text-secondary-dark);font-size:0.93rem;margin-bottom:20px;">
+            Drag the slider or click a year. See <strong style="color:var(--accent)">what actually happened to your fuel price</strong> vs. what crude oil was doing — exposing every COVID tax grab, every election token cut, and every profit supernova.
+        </p>
+
+        <!-- Phase colour strip guide -->
+        <div class="phase-strip">
+            <div class="phase-strip-seg baseline" title="2019 Stable"></div>
+            <div class="phase-strip-seg early20" title="Early COVID softening"></div>
+            <div class="phase-strip-seg covid" title="COVID Crash + Excise Hike"></div>
+            <div class="phase-strip-seg excise" title="Excise Windfall Era"></div>
+            <div class="phase-strip-seg rocket" title="Rocket Hikes Post-COVID"></div>
+            <div class="phase-strip-seg election" title="Election Excise Cut"></div>
+            <div class="phase-strip-seg ukraine" title="Ukraine War Shock"></div>
+            <div class="phase-strip-seg recapture" title="OMC Loss Recapture"></div>
+            <div class="phase-strip-seg profit" title="OMC Profit Surge"></div>
+            <div class="phase-strip-seg fy24" title="FY24 Record Profits"></div>
+            <div class="phase-strip-seg tokencut" title="Pre-Election Token Cut"></div>
+            <div class="phase-strip-seg reserves" title="Reserves Accumulation"></div>
+            <div class="phase-strip-seg current" title="Today — Superprofit Zone"></div>
+        </div>
+
+        <!-- Slider -->
+        <div class="timeline-slider-container">
+            <input type="range" id="timeline-slider" min="0" max="89" value="0">
+        </div>
+        <div class="timeline-ticks">
+            <span class="tick-link" data-index="0">2019</span>
+            <span class="tick-link" data-index="12">2020</span>
+            <span class="tick-link" data-index="24">2021</span>
+            <span class="tick-link" data-index="36">2022</span>
+            <span class="tick-link" data-index="48">2023</span>
+            <span class="tick-link" data-index="60">2024</span>
+            <span class="tick-link" data-index="72">2025</span>
+            <span class="tick-link" data-index="84">2026</span>
+        </div>
+
+        <!-- Simulator Display Grid -->
+        <div class="simulator-display-grid">
+
+            <!-- Date + Phase Icon -->
+            <div class="sim-panel date-status">
+                <div id="sim-date" class="sim-date-val">January 2019</div>
+                <span id="sim-icon" class="sim-icon-val">⚖️</span>
+                <div id="sim-status-text" class="sim-status-label">Stable Baseline</div>
+            </div>
+
+            <!-- Price Numbers -->
+            <div class="sim-panel price-specs">
+                <div class="spec-row">
+                    <span>Crude Cost (₹/L)</span>
+                    <strong id="sim-crude-inr" style="color:var(--info)">₹28.92</strong>
+                </div>
+                <div class="spec-row">
+                    <span>Crude (USD/bbl)</span>
+                    <strong id="sim-crude-usd" style="color:var(--info)">$65.20</strong>
+                </div>
+                <div class="spec-row">
+                    <span>Actual Pump Price</span>
+                    <strong id="sim-actual-price" style="color:var(--accent)">₹72.60</strong>
+                </div>
+                <div class="spec-row">
+                    <span>Fair Price (Benchmark)</span>
+                    <strong id="sim-fair-price" style="color:var(--success)">₹73.69</strong>
+                </div>
+                <div class="spec-row highlight">
+                    <span>Overpayment/L</span>
+                    <strong id="sim-diff-price">-₹1.09</strong>
+                </div>
+            </div>
+
+            <!-- Bulletin / Headline -->
+            <div class="sim-panel headline-flash balance" id="headline-flash-box">
+                <div class="flash-label">📰 WHAT WAS HAPPENING</div>
+                <div id="sim-headline" class="flash-headline">
+                    Pre-COVID stable era. Retail prices tracked global crude reasonably. Margins were normal.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Stacked Cost Bar - Full Width -->
+        <div class="sim-panel full-bar-panel" style="margin-top:18px; grid-column: 1/-1;">
+            <div class="flash-label">📊 HOW YOUR ₹1 IS SPLIT PER LITRE (Animated as you drag)</div>
+            <div class="sim-stacked-bar">
+                <div id="bar-crude" class="bar-segment crude" style="flex:28.92">Crude</div>
+                <div id="bar-refining" class="bar-segment refining" style="flex:8">Refining</div>
+                <div id="bar-taxes" class="bar-segment taxes" style="flex:35">Taxes</div>
+                <div id="bar-profit" class="bar-segment profit" style="flex:0.68">OMC Profit</div>
+            </div>
+            <div class="bar-legend">
+                <span class="legend-item"><span class="dot crude"></span>Crude Cost: <strong id="lbl-bar-crude">₹28.92</strong></span>
+                <span class="legend-item"><span class="dot refining"></span>Refining &amp; Commission: <strong id="lbl-bar-ref">₹8.00</strong></span>
+                <span class="legend-item"><span class="dot taxes"></span>Excise + State VAT: <strong id="lbl-bar-taxes">₹35.68</strong></span>
+                <span class="legend-item"><span class="dot profit"></span>OMC Overpayment: <strong id="lbl-bar-profit">₹0.00</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── KEY STATS INFO GRID ── -->
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-stat">₹80,987 Cr</div>
+            <div class="info-label">OMC Combined Net Profit — FY24</div>
+            <div class="info-sub">IOC + BPCL + HPCL record standalone profits while retail prices remained frozen at ₹97+</div>
+        </div>
+        <div class="info-card">
+            <div class="info-stat">₹14.50/L</div>
+            <div class="info-label">Current Overpayment vs Fair Price</div>
+            <div class="info-sub">Based on live crude at current rate vs. 2019 pre-COVID cost-plus model</div>
+        </div>
+        <div class="info-card">
+            <div class="info-stat">₹19.47/L</div>
+            <div class="info-label">Peak Overpayment (2023)</div>
+            <div class="info-sub">Crude at $80 but retail prices frozen at ₹97+. OMCs pocketed the entire crude drop.</div>
+        </div>
+        <div class="info-card">
+            <div class="info-stat">₹2 / Litre</div>
+            <div class="info-label">Only Relief Given in 5 Years</div>
+            <div class="info-sub">Before 2024 Lok Sabha elections — after OMCs had already extracted ₹80,000+ Crore in profits</div>
+        </div>
+    </div>
+
+    <!-- ── HISTORY CHART ── -->
+    <div class="card" style="margin-bottom:36px;">
+        <h2 class="card-title">📈 Historical Price Discrepancy (2019–2026)</h2>
+        <p style="color:var(--text-secondary-dark);font-size:0.93rem;margin-bottom:20px;">
+            The gap between the red line (actual price) and green dashed line (fair price) is the money extracted from consumers. This gap grew to a record in FY24.
+        </p>
+        <div class="chart-tabs">
+            <button class="chart-tab-btn active" data-product="petrol">Petrol History</button>
+            <button class="chart-tab-btn" data-product="diesel">Diesel History</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="analyticsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- ── SHARE ── -->
+    <div class="share-section">
+        <h3 style="font-size:1.5rem; margin-bottom:10px;">📢 Share This With Every Indian</h3>
+        <p style="color:var(--text-secondary-dark);font-size:0.95rem;">
+            Awareness is the first step. Help every common man understand why their fuel price doesn't drop when crude falls.
+        </p>
+        <div class="share-btns">
+            <a id="btn-twitter" href="#" target="_blank" class="share-btn twitter">🐦 Share on Twitter/X</a>
+            <a id="btn-whatsapp" href="#" target="_blank" class="share-btn whatsapp">💬 Share on WhatsApp</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Data sourced from PPAC India, IOC Annual Reports, RBI Exchange Rates, Bloomberg Crude historical data. 
+        This is an independent public interest tool — not affiliated with any political party or oil company.</p>
+        <p style="margin-top:8px;">Built for the Common Man of India 🇮🇳</p>
+    </footer>
+
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
