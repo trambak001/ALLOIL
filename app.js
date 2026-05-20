@@ -60,6 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
     populateCityDropdown();
     updateCalculator();
     renderHistoryChart();
+    setTimeout(() => {
+        updateTimelineSimulator(0);
+    }, 500);
 });
 
 // Setup Event Listeners
@@ -78,6 +81,11 @@ function setupEventListeners() {
             
             updateCalculator();
             updateChartData();
+            
+            const tSlider = document.getElementById("timeline-slider");
+            if (tSlider) {
+                updateTimelineSimulator(parseInt(tSlider.value));
+            }
         });
     });
 
@@ -160,8 +168,22 @@ function setupEventListeners() {
 
             updateCalculator();
             updateChartData();
+            
+            const tSlider = document.getElementById("timeline-slider");
+            if (tSlider) {
+                updateTimelineSimulator(parseInt(tSlider.value));
+            }
         });
     });
+
+    // Timeline slider event
+    const timelineSlider = document.getElementById("timeline-slider");
+    if (timelineSlider) {
+        timelineSlider.addEventListener("input", (e) => {
+            const index = parseInt(e.target.value);
+            updateTimelineSimulator(index);
+        });
+    }
 }
 
 // Populate City Dropdown
@@ -400,4 +422,162 @@ function updateChartData() {
     
     // Re-render chart
     historyChart.update();
+}
+
+// Highlight Chart Index
+function highlightChartIndex(index) {
+    if (!historyChart) return;
+    
+    const activeElements = [];
+    for (let i = 0; i < historyChart.data.datasets.length; i++) {
+        activeElements.push({
+            datasetIndex: i,
+            index: index
+        });
+    }
+    
+    historyChart.setActiveElements(activeElements);
+    
+    const meta = historyChart.getDatasetMeta(0);
+    if (meta && meta.data && meta.data[index]) {
+        const model = meta.data[index];
+        historyChart.tooltip.setActiveElements(activeElements, { x: model.x, y: model.y });
+    }
+    historyChart.update();
+}
+
+// Update Timeline Simulator Display
+function updateTimelineSimulator(index) {
+    const record = fuelData[index];
+    if (!record) return;
+    
+    const dateStr = record.date;
+    const crudeInr = record.crude_inr_litre;
+    const actualPrice = record[currentProduct];
+    const fairPrice = record[`fair_${currentProduct}`];
+    const diff = record[`${currentProduct}_overpayment`];
+    
+    const bulletin = getTimelineBulletin(index, dateStr);
+    
+    document.getElementById("sim-date").innerText = dateStr;
+    document.getElementById("sim-icon").innerText = bulletin.icon;
+    document.getElementById("sim-status-text").innerText = bulletin.status;
+    
+    document.getElementById("sim-crude-inr").innerText = `₹${crudeInr.toFixed(2)}`;
+    document.getElementById("sim-actual-price").innerText = `₹${actualPrice.toFixed(2)}`;
+    document.getElementById("sim-fair-price").innerText = `₹${fairPrice.toFixed(2)}`;
+    
+    const diffEl = document.getElementById("sim-diff-price");
+    if (diff > 0.05) {
+        diffEl.innerText = `+₹${diff.toFixed(2)}`;
+        diffEl.style.color = "var(--danger)";
+    } else if (diff < -0.05) {
+        diffEl.innerText = `-₹${Math.abs(diff).toFixed(2)}`;
+        diffEl.style.color = "var(--success)";
+    } else {
+        diffEl.innerText = `₹0.00`;
+        diffEl.style.color = "var(--text-primary-dark)";
+    }
+    
+    const flashBox = document.getElementById("headline-flash-box");
+    flashBox.className = `sim-panel headline-flash ${bulletin.class}`;
+    document.getElementById("sim-headline").innerText = bulletin.headline;
+    
+    highlightChartIndex(index);
+}
+
+// Bulletin Data Mapping based on month timeline indices (2019-2026)
+function getTimelineBulletin(index, dateStr) {
+    if (index >= 0 && index <= 11) {
+        return {
+            icon: "⚖️",
+            status: "Stable Baseline",
+            class: "balance",
+            headline: "Pre-COVID baseline pricing in Delhi. Retail fuel pricing follows international crude fluctuations smoothly with a reasonable corporate margin."
+        };
+    } else if (index >= 12 && index <= 13) {
+        return {
+            icon: "⚖️",
+            status: "Standard Pricing",
+            class: "balance",
+            headline: "Global oil prices soften to $50-60/bbl due to early signs of pandemic demand drop. Retail prices dip slightly."
+        };
+    } else if (index >= 14 && index <= 16) {
+        return {
+            icon: "🛑",
+            status: "COVID Tax Grab",
+            class: "feather",
+            headline: "COVID Crash: Crude crashes to $20.35/bbl (₹9.52/L). Instead of giving relief, Central Govt hikes excise duty by ₹13-16/L to swallow 100% of the crash, denying consumer relief."
+        };
+    } else if (index >= 17 && index <= 27) {
+        return {
+            icon: "🪶",
+            status: "High Excise Phase",
+            class: "feather",
+            headline: "Excise Windfall: Retail prices kept frozen at near-record levels despite cheap global crude, allowing the state treasury to capture record fuel excise revenues to fund pandemic recovery."
+        };
+    } else if (index >= 28 && index <= 34) {
+        return {
+            icon: "🚀",
+            status: "Rocket Escalation",
+            class: "rocket",
+            headline: "Post-COVID Hikes: Global crude recovers to $80. Retail prices are raised rapidly like rockets, crossing the psychological ₹100/L mark across major cities."
+        };
+    } else if (index >= 35 && index <= 37) {
+        return {
+            icon: "⚖️",
+            status: "Pre-Election Freeze",
+            class: "balance",
+            headline: "Temporary Excise Cut: Ahead of key assembly elections, the Central Government cuts excise duty by ₹5/L (petrol) and ₹10/L (diesel) to cool public anger."
+        };
+    } else if (index >= 38 && index <= 40) {
+        return {
+            icon: "🔵",
+            status: "OMC Under-Recovery",
+            class: "balance",
+            headline: "Ukraine War Peak: Crude oil spikes to $132.38/bbl. To control inflation, the government freezes retail prices. OMCs run heavy losses of up to ₹16/L."
+        };
+    } else if (index >= 41 && index <= 46) {
+        return {
+            icon: "🪶",
+            status: "Loss Recapture",
+            class: "feather",
+            headline: "Recapture Era: Crude falls back to $90, but retail prices remain frozen at peak levels to allow OMCs to recoup their Ukraine War under-recoveries."
+        };
+    } else if (index >= 47 && index <= 53) {
+        return {
+            icon: "🪶",
+            status: "OMC Profit Surge",
+            class: "feather",
+            headline: "Windfall Turn: Crude drops to $75-$80. Retail prices remain frozen at war peaks. OMCs swing to massive profits, reporting record marketing margins."
+        };
+    } else if (index >= 54 && index <= 62) {
+        return {
+            icon: "💰",
+            status: "FY24 Record Profits",
+            class: "feather",
+            headline: "Profit Supernova: OMCs report ₹80,987 Crore combined standalone net profits in FY24, fueled by cheap crude and frozen retail prices."
+        };
+    } else if (index >= 63 && index <= 64) {
+        return {
+            icon: "⚖️",
+            status: "Token Price Cuts",
+            class: "balance",
+            headline: "Pre-Election Cut: Ahead of 2024 Lok Sabha Elections, OMCs announce a token price cut of ₹2/L after keeping prices frozen for nearly two years."
+        };
+    } else if (index >= 65 && index <= 83) {
+        return {
+            icon: "🪶",
+            status: "Reserves Accumulation",
+            class: "feather",
+            headline: "Profit Stashing: Retail prices remain frozen near ₹97+ while crude is stable at $75. Combined OMC cash reserves climb toward a massive ₹3 Lakh Crore."
+        };
+    } else {
+        return {
+            icon: "🪶",
+            status: "Superprofit Recapture",
+            class: "feather",
+            headline: "June 2026: Crude drops to $72.00/bbl (2019 levels), yet consumers pay ₹97.85/L. OMCs extract a record ₹14.50/L surplus overpayment."
+        };
+    }
 }

@@ -589,3 +589,133 @@ footer {
         height: 350px;
     }
 }
+
+/* Rockets & Feathers Simulator styling */
+.timeline-slider-container {
+    margin: 30px 0 20px 0;
+    padding: 0 10px;
+}
+
+#timeline-slider {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.timeline-ticks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary-dark);
+    padding: 0 5px;
+    font-weight: 600;
+}
+
+.simulator-display-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1.8fr;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.sim-panel {
+    background: #0d1117;
+    border: 1px solid var(--card-border-dark);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.sim-panel.date-status {
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(88, 166, 255, 0.05) 0%, rgba(22, 27, 34, 0.8) 100%);
+}
+
+.sim-date-val {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.sim-icon-val {
+    font-size: 3rem;
+    margin-bottom: 8px;
+    transition: var(--transition);
+}
+
+.sim-status-label {
+    background: rgba(240, 246, 252, 0.1);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.price-specs .spec-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+    font-size: 0.9rem;
+}
+
+.price-specs .spec-row:last-child {
+    border-bottom: none;
+}
+
+.price-specs .spec-row.highlight {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.price-specs .spec-row.highlight strong {
+    color: var(--danger);
+}
+
+.headline-flash {
+    border-left: 4px solid var(--primary);
+    background: rgba(88, 166, 255, 0.02);
+    min-height: 120px;
+    justify-content: flex-start;
+}
+
+.headline-flash.rocket {
+    border-left-color: var(--danger);
+    background: rgba(255, 123, 114, 0.03);
+}
+
+.headline-flash.feather {
+    border-left-color: var(--warning);
+    background: rgba(210, 153, 34, 0.03);
+}
+
+.headline-flash.balance {
+    border-left-color: var(--success);
+    background: rgba(63, 185, 80, 0.03);
+}
+
+.flash-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    color: var(--text-secondary-dark);
+}
+
+.flash-headline {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-primary-dark);
+}
+
+@media (max-width: 768px) {
+    .simulator-display-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

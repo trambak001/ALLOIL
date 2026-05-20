@@ -172,6 +172,62 @@
                             <p>School Stationery</p>
                         </div>
                     </div>
+            </div>
+        </div>
+
+        <!-- Section: Rockets & Feathers Simulator -->
+        <div class="card full-width-section">
+            <h2 class="card-title">🚀 Rockets & Feathers Interactive Timeline (2019–2026)</h2>
+            <p style="color:var(--text-secondary-dark); font-size:0.95rem; margin-bottom:25px;">
+                Drag the timeline slider to trace how global oil changes failed to translate to pump price cuts. Notice the news events and corporate profit reports corresponding to each phase.
+            </p>
+
+            <div class="timeline-slider-container">
+                <input type="range" id="timeline-slider" min="0" max="89" value="0">
+                <div class="timeline-ticks" id="timeline-ticks">
+                    <span>2019</span>
+                    <span>2020</span>
+                    <span>2021</span>
+                    <span>2022</span>
+                    <span>2023</span>
+                    <span>2024</span>
+                    <span>2025</span>
+                    <span>2026</span>
+                </div>
+            </div>
+
+            <div class="simulator-display-grid">
+                <!-- Left panel: Month & Status Icon -->
+                <div class="sim-panel date-status">
+                    <div id="sim-date" class="sim-date-val">January 2019</div>
+                    <div id="sim-icon" class="sim-icon-val">⚖️</div>
+                    <div id="sim-status-text" class="sim-status-label">Stable Baseline</div>
+                </div>
+
+                <!-- Middle panel: Price Comparison Specs -->
+                <div class="sim-panel price-specs">
+                    <div class="spec-row">
+                        <span>Crude Cost (INR/L):</span>
+                        <strong id="sim-crude-inr">₹28.92</strong>
+                    </div>
+                    <div class="spec-row">
+                        <span>Actual Pump Price:</span>
+                        <strong id="sim-actual-price">₹72.60</strong>
+                    </div>
+                    <div class="spec-row">
+                        <span>Fair Price (2019 Baseline):</span>
+                        <strong id="sim-fair-price">₹73.69</strong>
+                    </div>
+                    <div class="spec-row highlight">
+                        <span>Consumer Margin/Overpayment:</span>
+                        <strong id="sim-diff-price">-₹1.09</strong>
+                    </div>
+                </div>
+
+                <!-- Right panel: Headline Flash -->
+                <div class="sim-panel headline-flash" id="headline-flash-box">
+                    <div class="flash-label">🚨 BULLETINS & WIND FALLS</div>
+                    <div id="sim-headline" class="flash-headline">Pre-COVID baseline. Fuel pricing matches market trends smoothly.</div>
                 </div>
             </div>
         </div>
