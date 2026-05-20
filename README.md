@@ -54,7 +54,7 @@ Since this app is built using pure **HTML, CSS, and Vanilla JavaScript**, it req
     ```
 2.  Open `index.html` in any browser to run it locally.
 3.  To host it on GitHub Pages from repository root, set **Settings** -> **Pages** -> **Build and deployment** -> **Source** to **GitHub Actions**.
-4.  Push to `main`; the included workflow (`.github/workflows/deploy-pages-from-root.yml`) deploys the site from the repository root (`.`).
+4.  Push to `main`; the included workflow (`.github/workflows/deploy-pages-from-root.yml`) deploys the site automatically.
 
 ---
 
