@@ -53,7 +53,8 @@ Since this app is built using pure **HTML, CSS, and Vanilla JavaScript**, it req
     git clone https://github.com/trambak001/ALLOIL.git
     ```
 2.  Open `index.html` in any browser to run it locally.
-3.  To host it on GitHub Pages, go to **Settings** -> **Pages** in your repository and set the source branch to **`main`**.
+3.  To host it on GitHub Pages from repository root, set **Settings** -> **Pages** -> **Build and deployment** -> **Source** to **GitHub Actions**.
+4.  Push to `main`; the included workflow (`.github/workflows/deploy-pages-from-root.yml`) deploys the site automatically.
 
 ---
 
