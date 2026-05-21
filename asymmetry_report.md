@@ -159,21 +159,4 @@ The corporate defense for this pricing behavior is **"prior loss recovery"**: OM
 3.  **Windfall Recapture Double-Dipping:** 
     During Phase 1 (2020), OMCs did not even receive the benefits of cheap crude because the government hiked taxes. In Phase 3, OMCs kept the margins. In either scenario, **the consumer loses**.
 
----
 
-
-## 🚀 Recommended Strategies for Public Platform Presentation
-
-To make this message loud and clear to the general public, we can deploy a public web application featuring:
-
-1.  **"The Fair Fuel Meter":**
-    A real-time calculator. Users select their city/state, input the current international crude price, and see a side-by-side comparison of the **Actual Price** they are paying vs. the **Fair cost-plus price** they should be paying. It explicitly calculates: *"You are paying ₹XX.XX extra per litre today."*
-2.  **Interactive Timeline (The "Rockets & Feathers" Simulator):**
-    A chart where users can drag a slider across the timeline (2019-2026) and see how crude drops failed to trigger retail price cuts, juxtaposed with news headlines of OMC quarterly profit reports (e.g., showing record OMC net profits of ₹12,000+ Crores while retail prices stayed frozen at ₹100).
-3.  **"Where Does Your Money Go?" Breakdown:**
-    A clean, interactive treemap displaying the exact rupee breakdown of a litre of petrol:
-    *   Raw Crude Cost (e.g., ₹38.58)
-    *   Refining & Freight (e.g., ₹6.00)
-    *   Dealer Commission (e.g., ₹3.80)
-    *   Central Excise + State VAT (e.g., ₹35.00)
-    *   OMC Superprofit (e.g., ₹14.50)
